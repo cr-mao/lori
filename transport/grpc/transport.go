@@ -10,10 +10,10 @@ var _ transport.Transporter = (*Transport)(nil)
 
 // Transport is a gRPC transport.
 type Transport struct {
-	endpoint    string // http://127.0.0.1:9000
-	operation   string // grpc method路径
-	reqHeader   headerCarrier
-	replyHeader headerCarrier
+	endpoint    string        // http://127.0.0.1:9000
+	operation   string        // grpc method路径
+	reqHeader   headerCarrier //请求头
+	replyHeader headerCarrier //响应头
 }
 
 // Kind returns the transport kind.

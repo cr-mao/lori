@@ -3,12 +3,13 @@ package grpc
 import (
 	"context"
 	"crypto/tls"
-	"github.com/cr-mao/lori/internal/endpoint"
-	"github.com/cr-mao/lori/internal/host"
 	"net"
 	"net/url"
 	"time"
 
+	"github.com/cr-mao/lori/internal/endpoint"
+	"github.com/cr-mao/lori/internal/host"
+	"github.com/cr-mao/lori/transport"
 	//apimd "github.com/cr-mao/lori/api/metadata"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -18,6 +19,9 @@ import (
 
 	"github.com/cr-mao/lori/log"
 )
+
+var _ transport.Endpointer = (*Server)(nil)
+var _ transport.Server = (*Server)(nil)
 
 // Server is a gRPC server wrapper.
 type Server struct {

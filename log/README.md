@@ -1,6 +1,6 @@
 # Logger
 
-kratos log 拿过来的。
+kratos log v2.6.2 版本原样拿过来的
 
 ## Usage
 
@@ -40,3 +40,6 @@ log.Error("warn log")
 ## Third party log library
 
 - zap log 
+  - 使用见 zap/zap_test.go
+
+

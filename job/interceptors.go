@@ -3,18 +3,19 @@ package job
 import (
 	"context"
 	"fmt"
-	"game-server/infra/log_bak"
+
+	"github.com/cr-mao/lori/log"
 )
 
 type Work func(context.Context) error
 
 func ErrorHandler(v interface{}) error {
 	if err, ok := v.(error); ok {
-		log_bak.Warnf("recover", "err_msg", err.Error())
+		log.Errorw("recover_err", err.Error())
 		return err
 	}
 	returnErr := fmt.Errorf("Unknown Error, type: %T, value: %v", v, v)
-	log_bak.Warnf("recover", "err_msg", returnErr.Error())
+	log.Errorw("recover_err", returnErr.Error())
 	return returnErr
 }
 

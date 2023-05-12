@@ -3,21 +3,25 @@ package grpc
 import (
 	"context"
 	"crypto/tls"
-	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/health/grpc_health_v1"
-	"google.golang.org/grpc/reflection"
+	"github.com/cr-mao/lori/internal/endpoint"
+	"github.com/cr-mao/lori/internal/host"
 	"net"
 	"net/url"
 	"time"
 
 	//apimd "github.com/cr-mao/lori/api/metadata"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
+	"google.golang.org/grpc/reflection"
+
+	"github.com/cr-mao/lori/log"
 )
 
 // Server is a gRPC server wrapper.
 type Server struct {
-	Server     *grpc.Server
+	*grpc.Server
 	tlsConf    *tls.Config // TLS configuration ,https
 	baseCtx    context.Context
 	network    string                         // tcp
@@ -31,6 +35,7 @@ type Server struct {
 	//metadata      *apimd.Server
 	endpoint      *url.URL // url
 	enableMetrics bool     //是否开启链路追踪
+	err           error
 }
 
 // NewServer creates a gRPC server by options.
@@ -78,6 +83,60 @@ func NewServer(opts ...ServerOption) *Server {
 	// Register reflection service on gRPC server.
 	reflection.Register(srv.Server)
 	return srv
+}
+
+// Endpoint return a real address to registry endpoint.
+// examples:
+//
+//	grpc://127.0.0.1:9000?isSecure=false
+func (s *Server) Endpoint() (*url.URL, error) {
+	if err := s.listenAndEndpoint(); err != nil {
+		return nil, s.err
+	}
+	return s.endpoint, nil
+}
+
+// Start start the gRPC server.
+func (s *Server) Start(ctx context.Context) error {
+	if err := s.listenAndEndpoint(); err != nil {
+		return s.err
+	}
+	s.baseCtx = ctx
+	log.Infof("[gRPC] server listening on: %s", s.lis.Addr().String())
+	//设置serving 状态
+	s.health.Resume()
+	return s.Serve(s.lis)
+}
+
+// Stop stop the gRPC server.
+func (s *Server) Stop(_ context.Context) error {
+	//if s.adminClean != nil {
+	//	s.adminClean()
+	//}
+	s.health.Shutdown()
+	s.GracefulStop()
+	log.Info("[gRPC] server stopping")
+	return nil
+}
+
+func (s *Server) listenAndEndpoint() error {
+	if s.lis == nil {
+		lis, err := net.Listen(s.network, s.address)
+		if err != nil {
+			s.err = err
+			return err
+		}
+		s.lis = lis
+	}
+	if s.endpoint == nil {
+		addr, err := host.Extract(s.address, s.lis)
+		if err != nil {
+			s.err = err
+			return err
+		}
+		s.endpoint = endpoint.NewEndpoint(endpoint.Scheme("grpc", s.tlsConf != nil), addr)
+	}
+	return s.err
 }
 
 // ServerOption is gRPC server option.

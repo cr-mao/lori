@@ -27,7 +27,6 @@ func (x *testWriteSyncer) Sync() error {
 
 // getEncoder 设置日志存储格式
 func getEncoder() zapcore.Encoder {
-
 	// 日志格式规则
 	encoderConfig := zapcore.EncoderConfig{
 		TimeKey:        "time",
@@ -87,6 +86,11 @@ func TestDetailLogger(t *testing.T) {
 	zlog.Warnw("log", "warn")
 	zlog.Errorw("log", "error")
 	zlog.Errorw("log", "error", "except warn", "11")
+	zlog.Infow("log", "info", "222", "ddd")
+	log.SetLogger(logger)
+
+	log.Info("xx", "xxdkdk", "11")
+	log.Infow("A", "aa", "b", "bb")
 }
 
 func TestLogger(t *testing.T) {
@@ -112,6 +116,7 @@ func TestLogger(t *testing.T) {
 	zlog.Warnw("log", "warn")
 	zlog.Errorw("log", "error")
 	zlog.Errorw("log", "error", "except warn")
+	zlog.Infow("log", "info", "222", "ddd")
 
 	except := []string{
 		"{\"level\":\"debug\",\"msg\":\"\",\"log\":\"debug\"}\n",

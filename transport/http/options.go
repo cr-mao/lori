@@ -1,12 +1,21 @@
 package http
 
-import "crypto/tls"
+import (
+	"crypto/tls"
+	"time"
+)
 
 type ServerOption func(*Server)
 
 func WithAddress(addr string) ServerOption {
 	return func(s *Server) {
 		s.address = addr
+	}
+}
+
+func WithTimeout(timeout time.Duration) ServerOption {
+	return func(s *Server) {
+		s.timeout = timeout
 	}
 }
 

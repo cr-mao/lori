@@ -82,10 +82,10 @@ func (a *App) Run() error {
 		// 复制一个，防止..
 		server := srv
 		eg.Go(func() error {
-			<-ctx.Done() // wait for stop signal , 收到信号后走Stop方法，然后把context cancel掉 关闭context 后，则都会执行
+			<-ctx.Done() // wait for stop signal , 收到信号后走Stop方法，然后把context cancel掉
 			stopCtx, cancel := context.WithTimeout(NewContext(a.opts.ctx, a), a.opts.stopTimeout)
 			defer cancel()
-			return server.Stop(stopCtx)
+			return server.Stop(stopCtx) //执行server的stop 下面的start 方法会停止阻塞。
 		})
 		wg.Add(1)
 		eg.Go(func() error {

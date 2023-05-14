@@ -83,6 +83,16 @@ func NewServer(opts ...ServerOption) *Server {
 		srv.Use(mids.TimeoutMiddleware(srv.timeout))
 		log.Infof("install middleware: %s", "timeout")
 	}
+
+	//设置开发模式，打印路由信息
+	if srv.mode != gin.DebugMode && srv.mode != gin.ReleaseMode && srv.mode != gin.TestMode {
+		srv.mode = gin.ReleaseMode
+	}
+	//设置开发模式
+	gin.SetMode(srv.mode)
+	gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {
+		log.Infof("%-6s %-s --> %s(%d handlers)", httpMethod, absolutePath, handlerName, nuHandlers)
+	}
 	return srv
 }
 
@@ -120,15 +130,6 @@ func (s *Server) Endpoint() (*url.URL, error) {
 
 // start rest server
 func (s *Server) Start(ctx context.Context) error {
-	//设置开发模式，打印路由信息
-	if s.mode != gin.DebugMode && s.mode != gin.ReleaseMode && s.mode != gin.TestMode {
-		return errors.New("mode must be one of debug/release/test")
-	}
-	//设置开发模式，打印路由信息
-	gin.SetMode(s.mode)
-	gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {
-		log.Infof("%-6s %-s --> %s(%d handlers)", httpMethod, absolutePath, handlerName, nuHandlers)
-	}
 	//根据配置初始化pprof路由
 	if s.enableProfiling {
 		pprof.Register(s.Engine)

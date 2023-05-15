@@ -17,7 +17,7 @@ func TestFilterAll(_ *testing.T) {
 	log.Log(LevelDebug, "msg", "test debug")
 	log.Info("hello")
 	log.Infow("password", "123456")
-	log.Infow("username", "kratos")
+	log.Infow("username", "lori")
 	log.Warn("warn log")
 }
 

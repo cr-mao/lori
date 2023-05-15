@@ -35,14 +35,14 @@ type Server struct {
 	//开发模式， 默认值 debug
 	mode string
 
-	//是否开启健康检查接口， 默认开启， 如果开启会自动添加 /health 接口,暂时没用
-	healthz bool
-
 	//是否开启pprof接口， 默认开启， 如果开启会自动添加 /debug/pprof 接口
 	enableProfiling bool
 
-	//是否开启metrics接口， 默认开启， 如果开启会自动添加 /metrics 接口
+	//是否开启metrics接口， 默认开启， 如果开启会自动添加 /metrics 接口, prometheus
 	enableMetrics bool
+
+	// 指标path  默认/metrics
+	metricsPath string
 
 	//中间件
 	middlewares []string //传字符串进来， 顺序需要自己定义好
@@ -60,11 +60,11 @@ func NewServer(opts ...ServerOption) *Server {
 		network:         "tcp",
 		address:         ":0",
 		mode:            "debug",
-		healthz:         true,
 		enableProfiling: true,
 		Engine:          gin.New(), //纯的，没有logger，和default 。
 		serviceName:     "lori-gin-http",
 		timeout:         time.Second * 5, //默认5秒
+		metricsPath:     "/metrics",
 	}
 	for _, o := range opts {
 		o(srv)
@@ -135,8 +135,9 @@ func (s *Server) Start(ctx context.Context) error {
 		pprof.Register(s.Engine)
 	}
 	if s.enableMetrics {
-		//todo
+
 	}
+
 	if err := s.listenAndEndpoint(); err != nil {
 		return err
 	}

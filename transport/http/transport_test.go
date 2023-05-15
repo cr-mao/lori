@@ -87,8 +87,8 @@ func TestHeaderCarrier_Keys(t *testing.T) {
 func TestSetOperation(t *testing.T) {
 	tr := &Transport{}
 	ctx := transport.NewServerContext(context.Background(), tr)
-	SetOperation(ctx, "kratos")
-	if !reflect.DeepEqual(tr.operation, "kratos") {
-		t.Errorf("expect %v, got %v", "kratos", tr.operation)
+	SetOperation(ctx, "lori")
+	if !reflect.DeepEqual(tr.operation, "lori") {
+		t.Errorf("expect %v, got %v", "lori", tr.operation)
 	}
 }

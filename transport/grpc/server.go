@@ -38,7 +38,7 @@ type Server struct {
 	health     *health.Server // 健康检测server
 	//metadata      *apimd.Server
 	endpoint      *url.URL // url
-	enableMetrics bool     //是否开启链路追踪
+	enableMetrics bool     //是否开启监控， prometheus
 	err           error
 }
 
@@ -58,27 +58,39 @@ func NewServer(opts ...ServerOption) *Server {
 		unaryCrashInterceptor,        //防止panic crash 中间件
 		srv.unaryServerInterceptor(), //metadata 方便获取， 请求超时控制中间件
 	}
+
+	//请求方法耗时中间件
+	if srv.enableMetrics {
+		unaryInts = append(unaryInts, serverUnaryPrometheusInterceptor)
+	}
+
 	streamInts := []grpc.StreamServerInterceptor{
 		streamCrashInterceptor,
 		srv.streamServerInterceptor(),
 	}
+
 	if len(srv.unaryInts) > 0 {
 		unaryInts = append(unaryInts, srv.unaryInts...)
 	}
 	if len(srv.streamInts) > 0 {
 		streamInts = append(streamInts, srv.streamInts...)
 	}
+
 	grpcOpts := []grpc.ServerOption{
 		grpc.ChainUnaryInterceptor(unaryInts...),
 		grpc.ChainStreamInterceptor(streamInts...),
 	}
+
+	//todo
 	if srv.tlsConf != nil {
 		grpcOpts = append(grpcOpts, grpc.Creds(credentials.NewTLS(srv.tlsConf)))
 	}
+	//用户传的ServerOption
 	if len(srv.grpcOpts) > 0 {
 		grpcOpts = append(grpcOpts, srv.grpcOpts...)
 	}
 	srv.Server = grpc.NewServer(grpcOpts...)
+
 	//srv.metadata = apimd.NewServer(srv.Server)
 	// internal register ,健康检测， 框架自带的server
 	grpc_health_v1.RegisterHealthServer(srv.Server, srv.health)

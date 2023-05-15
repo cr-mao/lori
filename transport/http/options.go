@@ -49,14 +49,14 @@ func WithMiddlewares(middlewares []string) ServerOption {
 	}
 }
 
-func WithHealthz(healthz bool) ServerOption {
-	return func(s *Server) {
-		s.healthz = healthz
-	}
-}
-
 func WithMetrics(enable bool) ServerOption {
 	return func(o *Server) {
 		o.enableMetrics = enable
+	}
+}
+
+func WithMetricsPath(metricsPath string) ServerOption {
+	return func(o *Server) {
+		o.metricsPath = metricsPath
 	}
 }

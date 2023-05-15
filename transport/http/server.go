@@ -38,7 +38,7 @@ type Server struct {
 	//是否开启pprof接口， 默认开启， 如果开启会自动添加 /debug/pprof 接口
 	enableProfiling bool
 
-	//是否开启metrics接口， 默认开启， 如果开启会自动添加 /metrics 接口, prometheus
+	//是否开启metrics接口， 默认开启， 如果开启会自动添加 /metrics 接口, prometheus , todo 优化成一个接口。
 	enableMetrics bool
 
 	// 指标path  默认/metrics

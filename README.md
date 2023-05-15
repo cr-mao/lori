@@ -10,13 +10,25 @@ lori 是一款基于golang的分布式服务器框架,目标是快速构建服�
 - grpc client 
 - tcp server todo
 
-**暂时放弃模块化方式，先快速实现，后期再优化**
-
-
 
 ```shell
-go get -u github.com/cr-mao/lori
+go get  github.com/cr-mao/lori@v0.0.1
 ```
+
+
+### todo 
+
+- 模块化设计 （可参考kratos，先定死组件快速实现)
+
+
+  
+
+
+
+
+
+
+
 
 参考kratos,go-zero,due框架
 

@@ -2,6 +2,7 @@ package http
 
 import (
 	"crypto/tls"
+	"github.com/cr-mao/lori/metric"
 	"time"
 )
 
@@ -49,14 +50,8 @@ func WithMiddlewares(middlewares []string) ServerOption {
 	}
 }
 
-func WithMetrics(enable bool) ServerOption {
-	return func(o *Server) {
-		o.enableMetrics = enable
-	}
-}
-
-func WithMetricsPath(metricsPath string) ServerOption {
-	return func(o *Server) {
-		o.metricsPath = metricsPath
+func WithMetric(metric metric.GinMetric) ServerOption {
+	return func(s *Server) {
+		s.metric = metric
 	}
 }

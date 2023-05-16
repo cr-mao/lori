@@ -1,20 +1,20 @@
-package grpc
+package grpcmetric
 
 import (
 	"context"
-	"time"
-
 	"github.com/cr-mao/lori/metric"
+	"github.com/cr-mao/lori/metric/prometheus"
 	"google.golang.org/grpc"
+	"time"
 )
 
-/*
-基本指标。 1. 每个请求的耗时(histogram)
-*/
+
+type PromInstance struct {
+}
 
 //  名称暂时写死, 可以不用这个，自己外面传中间件即可。
 var (
-	metricServerReqDur = metric.NewHistogramVec(&metric.HistogramVecOpts{
+	metricServerReqDur = prometheus.NewHistogramVec(&prometheus.HistogramVecOpts{
 		Namespace: "grpc_server",
 		Subsystem: "requests",
 		Name:      "grpc_server_duration_ms",
@@ -24,8 +24,16 @@ var (
 	})
 )
 
+func NewMetricInstance() metric.GrpcMetric {
+	return &PromInstance{}
+}
+
+func (p *PromInstance) GrpcMetricInterceptors() []grpc.UnaryServerInterceptor {
+	return []grpc.UnaryServerInterceptor{p.serverUnaryPrometheusInterceptor}
+}
+
 //每个方法耗时的中间件
-func serverUnaryPrometheusInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
+func (p *PromInstance) serverUnaryPrometheusInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
 	handler grpc.UnaryHandler) (resp interface{}, err error) {
 	startTime := time.Now()
 	resp, err = handler(ctx, req)

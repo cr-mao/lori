@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"crypto/tls"
+	"github.com/cr-mao/lori/metric"
 	"net"
 	"net/url"
 	"time"
@@ -37,9 +38,10 @@ type Server struct {
 	timeout    time.Duration
 	health     *health.Server // 健康检测server
 	//metadata      *apimd.Server
-	endpoint      *url.URL // url
-	enableMetrics bool     //是否开启监控， prometheus
-	err           error
+	endpoint *url.URL          // url
+	metric   metric.GrpcMetric //metric 接口，可以传可不传
+
+	err error
 }
 
 // NewServer creates a gRPC server by options.
@@ -59,9 +61,8 @@ func NewServer(opts ...ServerOption) *Server {
 		srv.unaryServerInterceptor(), //metadata 方便获取， 请求超时控制中间件
 	}
 
-	//请求方法耗时中间件
-	if srv.enableMetrics {
-		unaryInts = append(unaryInts, serverUnaryPrometheusInterceptor)
+	if srv.metric != nil {
+		unaryInts = append(unaryInts, srv.metric.GrpcMetricInterceptors()...)
 	}
 
 	streamInts := []grpc.StreamServerInterceptor{
@@ -170,11 +171,11 @@ func WithAddress(address string) ServerOption {
 	}
 }
 
-func WithEnableMetrics(enableMetrics bool) ServerOption {
-	return func(o *Server) {
-		o.enableMetrics = enableMetrics
-	}
-}
+//func WithEnableMetrics(enableMetrics bool) ServerOption {
+//	return func(o *Server) {
+//		o.enableMetrics = enableMetrics
+//	}
+//}
 
 // Listener with server lis
 func WithListener(lis net.Listener) ServerOption {

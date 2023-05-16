@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"errors"
+	"github.com/cr-mao/lori/metric"
 
 	"net"
 	"net/http"
@@ -39,10 +40,7 @@ type Server struct {
 	enableProfiling bool
 
 	//是否开启metrics接口， 默认开启， 如果开启会自动添加 /metrics 接口, prometheus , todo 优化成一个接口。
-	enableMetrics bool
-
-	// 指标path  默认/metrics
-	metricsPath string
+	metric metric.GinMetric
 
 	//中间件
 	middlewares []string //传字符串进来， 顺序需要自己定义好
@@ -64,7 +62,6 @@ func NewServer(opts ...ServerOption) *Server {
 		Engine:          gin.New(), //纯的，没有logger，和default 。
 		serviceName:     "lori-gin-http",
 		timeout:         time.Second * 5, //默认5秒
-		metricsPath:     "/metrics",
 	}
 	for _, o := range opts {
 		o(srv)
@@ -134,8 +131,8 @@ func (s *Server) Start(ctx context.Context) error {
 	if s.enableProfiling {
 		pprof.Register(s.Engine)
 	}
-	if s.enableMetrics {
-
+	if s.metric != nil {
+		s.metric.Use(s.Engine)
 	}
 
 	if err := s.listenAndEndpoint(); err != nil {

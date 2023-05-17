@@ -22,7 +22,7 @@ func streamCrashInterceptor(svr interface{}, stream grpc.ServerStream, _ *grpc.S
 func unaryCrashInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
 	handler grpc.UnaryHandler) (resp interface{}, err error) {
 	defer handleCrash(func(r interface{}) {
-		log.Errorf("%+v\n \n %s", r, debug.Stack())
+		log.Errorf("recovery method: %s, message: %+v\n \n %s", info.FullMethod, r, debug.Stack())
 	})
 	return handler(ctx, req)
 }

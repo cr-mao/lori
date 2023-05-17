@@ -59,6 +59,7 @@ func NewServer(opts ...ServerOption) *Server {
 	unaryInts := []grpc.UnaryServerInterceptor{
 		unaryCrashInterceptor,        //防止panic crash 中间件
 		srv.unaryServerInterceptor(), //metadata 方便获取， 请求超时控制中间件
+		unaryErrorLogInterceptor,     //发生错误的日志
 	}
 
 	if srv.metric != nil {

@@ -95,6 +95,9 @@ package errors
 import (
 	"fmt"
 	"io"
+
+	gCode "google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // New returns an error with the supplied message.
@@ -362,4 +365,33 @@ func Cause(err error) error {
 		err = cause.Cause()
 	}
 	return err
+}
+
+func FromGrpcError(e error) error {
+	if e == nil {
+		return e
+	}
+
+	st, ok := status.FromError(e)
+	if !ok {
+		return WithCode(100002, "unknown error")
+	}
+
+	return &withCode{
+		err:  st.Err(),
+		code: int(st.Code()),
+	}
+}
+
+func ToGrpcError(e error) error {
+	if e == nil {
+		return e
+	}
+
+	var perr *withCode
+	if As(e, &perr) {
+		err := status.Error(gCode.Code(perr.code), perr.err.Error())
+		return err
+	}
+	return status.Error(gCode.Unknown, e.Error())
 }

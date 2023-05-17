@@ -10,8 +10,6 @@ type GrpcMetric interface {
 }
 
 type GinMetric interface {
-	MiddleWares() []gin.HandlerFunc
 	SetMetricPath(path string)
-	GetMetricPath() string
 	Use(router gin.IRouter)
 }

@@ -31,30 +31,6 @@ go get github.com/cr-mao/lori/registry/consul@v0.0.1
 日志
 - zap 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-参考kratos,go-zero,due框架
+参考kratos,go-zero,due框架,iam 极客时间go语言项目实战
 
 

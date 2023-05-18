@@ -13,3 +13,7 @@ type GinMetric interface {
 	SetMetricPath(path string)
 	Use(router gin.IRouter)
 }
+
+type GrpcClientMetric interface {
+	GrpcClientMetricInterceptors() []grpc.UnaryClientInterceptor // grpc client 中间件
+}

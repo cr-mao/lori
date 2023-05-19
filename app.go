@@ -40,7 +40,7 @@ func New(opts ...Option) *App {
 		ctx:              context.Background(),
 		sigs:             []os.Signal{syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT},
 		registrarTimeout: 10 * time.Second,
-		stopTimeout:      10 * time.Second,
+		stopTimeout:      10 * time.Second, //注意长链接，这个时间要给足够长。
 	}
 	if id, err := uuid.NewUUID(); err == nil {
 		o.id = id.String()
@@ -82,7 +82,7 @@ func (a *App) Run() error {
 		// 复制一个，防止..
 		server := srv
 		eg.Go(func() error {
-			<-ctx.Done() // wait for stop signal , 收到信号后走Stop方法，然后把context cancel掉
+			<-ctx.Done() // wait for stop signal , 收到信号后走Stop方法，然后把app的context cancel掉，那么它的子context就会关闭。
 			stopCtx, cancel := context.WithTimeout(NewContext(a.opts.ctx, a), a.opts.stopTimeout)
 			defer cancel()
 			return server.Stop(stopCtx) //执行server的stop 下面的start 方法会停止阻塞。

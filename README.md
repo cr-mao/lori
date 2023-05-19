@@ -9,11 +9,12 @@ lori 是一款基于golang的分布式服务器框架,目标是快速构建服�
 - http server 基于gin 
 - grpc server  
 - grpc client 
-- tcp server todo
+- tcp server 基于 [zinx v1.1.20](https://github.com/aceld/zinx) 改造, 适配lori的transport。
+
 
 ### 2.安装
 ```shell
-go get  github.com/cr-mao/lori@v0.0.1
+go get github.com/cr-mao/lori@v0.0.3
 ```
 
 
@@ -22,7 +23,7 @@ go get  github.com/cr-mao/lori@v0.0.1
 服务注册发现 
 - consul 
 ```shell
-go get github.com/cr-mao/lori/registry/consul@v0.0.1
+go get github.com/cr-mao/lori/registry/consul@v0.0.3
 ```
 
 指标监控

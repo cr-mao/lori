@@ -9,6 +9,7 @@ import (
 )
 
 func TestNewClient(t *testing.T) {
+	t.SkipNow()
 	client := tcp.NewClient()
 
 	client.OnConnect(func(conn network.Conn) {

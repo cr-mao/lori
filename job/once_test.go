@@ -34,7 +34,7 @@ func TestInterceptorsUnkownError(t *testing.T) {
 		Work: func(ctx context.Context) error {
 			fmt.Println("once job")
 			panic("throw  exception")
-			return nil
+			//return nil
 		},
 	}
 	onceJob.Run(context.Background())
@@ -53,7 +53,7 @@ func TestInterceptorsWithError(t *testing.T) {
 		Work: func(ctx context.Context) error {
 			fmt.Println("once job")
 			panic(errors.New("test error"))
-			return nil
+			//return nil
 		},
 	}
 	onceJob.Run(context.Background())

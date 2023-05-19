@@ -2,19 +2,21 @@ package rtcp
 
 import (
 	"context"
-	"crypto/rand"
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"github.com/cr-mao/lori/transport"
 	"net"
 	"net/http"
+	"net/url"
 	"sync/atomic"
 	"time"
 
 	"github.com/gorilla/websocket"
 
+	"github.com/cr-mao/lori/internal/endpoint"
+	"github.com/cr-mao/lori/internal/host"
 	"github.com/cr-mao/lori/log"
+	"github.com/cr-mao/lori/transport"
 	"github.com/cr-mao/lori/transport/rtcp/conf"
 	"github.com/cr-mao/lori/transport/rtcp/decoder"
 	"github.com/cr-mao/lori/transport/rtcp/iface"
@@ -22,6 +24,7 @@ import (
 )
 
 var _ transport.Server = (*Server)(nil)
+var _ transport.Endpointer = (*Server)(nil)
 
 // Server interface implementation, defines a Server service class
 // (接口实现，定义一个Server服务类)
@@ -78,6 +81,15 @@ type Server struct {
 
 	// connection id
 	cID uint64
+
+	//endpoint 服务注册地址
+	endpoint *url.URL
+	//绑定的listener
+	lis net.Listener
+	//终止的错误
+	err error
+	// tls 加密传输 有外部传入
+	tlsConf *tls.Config
 }
 
 // newServerWithConfig creates a server handle based on config
@@ -176,40 +188,34 @@ func (s *Server) StartConn(conn iface.IConnection) {
 }
 
 func (s *Server) ListenTcpConn() error {
-	// 1. Get a TCP address
-	addr, err := net.ResolveTCPAddr(s.IPVersion, fmt.Sprintf("%s:%d", s.IP, s.Port))
-	if err != nil {
-		log.Errorf("[START] resolve tcp addr err: %v\n", err)
+	var err error
+	if err = s.listenAndEndpoint(); err != nil {
+		s.err = err
 		return err
 	}
-
-	// 2. Listen to the server address
-	var listener net.Listener
-	if conf.GlobalObject.CertFile != "" && conf.GlobalObject.PrivateKeyFile != "" {
-		// Read certificate and private key
-		crt, err := tls.LoadX509KeyPair(conf.GlobalObject.CertFile, conf.GlobalObject.PrivateKeyFile)
-		if err != nil {
-			//todo log
-			return err
-		}
-
-		// TLS connection
-		tlsConfig := &tls.Config{}
-		tlsConfig.Certificates = []tls.Certificate{crt}
-		tlsConfig.Time = time.Now
-		tlsConfig.Rand = rand.Reader
-		listener, err = tls.Listen(s.IPVersion, fmt.Sprintf("%s:%d", s.IP, s.Port), tlsConfig)
-		if err != nil {
-			//todo log
-			return err
-		}
-	} else {
-		listener, err = net.ListenTCP(s.IPVersion, addr)
-		if err != nil {
-
-			return err
-		}
-	}
+	//if conf.GlobalObject.CertFile != "" && conf.GlobalObject.PrivateKeyFile != "" {
+	//	// Read certificate and private key
+	//	crt, err := tls.LoadX509KeyPair(conf.GlobalObject.CertFile, conf.GlobalObject.PrivateKeyFile)
+	//	if err != nil {
+	//		return err
+	//	}
+	//
+	//	// TLS connection
+	//	tlsConfig := &tls.Config{}
+	//	tlsConfig.Certificates = []tls.Certificate{crt}
+	//	tlsConfig.Time = time.Now
+	//	tlsConfig.Rand = rand.Reader
+	//	listener, err = tls.Listen(s.IPVersion, fmt.Sprintf("%s:%d", s.IP, s.Port), tlsConfig)
+	//	if err != nil {
+	//		return err
+	//	}
+	//} else {
+	//	listener, err = net.ListenTCP(s.IPVersion, addr)
+	//	if err != nil {
+	//
+	//		return err
+	//	}
+	//}
 
 	// 3. Start server network connection business
 	go func() {
@@ -223,7 +229,7 @@ func (s *Server) ListenTcpConn() error {
 			}
 			// 3.2 Block and wait for a client to establish a connection request.
 			// (阻塞等待客户端建立连接请求)
-			conn, err := listener.Accept()
+			conn, err := s.lis.Accept()
 			if err != nil {
 				//Go 1.16+
 				if errors.Is(err, net.ErrClosed) {
@@ -248,11 +254,12 @@ func (s *Server) ListenTcpConn() error {
 	}()
 	select {
 	case <-s.exitChan:
-		err = listener.Close()
+		err = s.lis.Close()
 		if err != nil {
 			log.Errorf("listener close err: %v", err)
 		}
 	}
+	s.err = err
 	return err
 }
 
@@ -301,7 +308,6 @@ func (s *Server) ListenWebsocketConn() error {
 	})
 
 	return http.ListenAndServe(fmt.Sprintf("%s:%d", s.IP, s.WsPort), nil)
-
 }
 
 // Start the network service
@@ -327,6 +333,9 @@ func (s *Server) Start(_ context.Context) error {
 		err = s.ListenTcpConn()
 	case conf.ServerModeWebsocket:
 		err = s.ListenWebsocketConn()
+	}
+	if err != nil {
+		log.Errorf("rtcp serve finish err:%+v", err)
 	}
 	return err
 }
@@ -408,6 +417,11 @@ func (s *Server) GetMsgHandler() iface.IMsgHandle {
 	return s.msgHandler
 }
 
+//设置tls
+func (s *Server) SetTlsConf(tlsConf *tls.Config) {
+	s.tlsConf = tlsConf
+}
+
 // StartHeartBeat starts the heartbeat check.
 // interval is the time interval between each heartbeat.
 // (启动心跳检测
@@ -484,4 +498,49 @@ func (s *Server) SetWebsocketAuth(f func(r *http.Request) error) {
 
 func (s *Server) ServerName() string {
 	return s.Name
+}
+
+func (s *Server) Endpoint() (*url.URL, error) {
+	if err := s.listenAndEndpoint(); err != nil {
+		return nil, err
+	}
+	return s.endpoint, nil
+}
+
+func (s *Server) Address() string {
+	return fmt.Sprintf("%s:%d", s.IP, s.Port)
+}
+
+func (s *Server) listenAndEndpoint() error {
+	if s.lis == nil {
+		// 1. Get a TCP address
+		addr, err := net.ResolveTCPAddr(s.IPVersion, s.Address())
+		if err != nil {
+			log.Errorf("[START] resolve tcp addr err: %v\n", err)
+			return err
+		}
+		// 2. Listen to the server address
+		if s.tlsConf != nil {
+			s.lis, err = tls.Listen(s.IPVersion, s.Address(), s.tlsConf)
+			if err != nil {
+				s.err = err
+				return err
+			}
+		} else {
+			s.lis, err = net.ListenTCP(s.IPVersion, addr)
+			if err != nil {
+				s.err = err
+				return err
+			}
+		}
+	}
+	if s.endpoint == nil {
+		addr, err := host.Extract(s.Address(), s.lis)
+		if err != nil {
+			s.err = err
+			return err
+		}
+		s.endpoint = endpoint.NewEndpoint(endpoint.Scheme("tcp", s.tlsConf != nil), addr)
+	}
+	return s.err
 }

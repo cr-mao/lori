@@ -12,6 +12,7 @@ import (
 func (s *Server) unaryServerInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		var cancel context.CancelFunc
+		// 读取 metadata ，header头
 		md, _ := grpcmd.FromIncomingContext(ctx)
 		replyHeader := grpcmd.MD{}
 		tr := &Transport{

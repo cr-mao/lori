@@ -96,6 +96,10 @@ func DialInsecure(ctx context.Context, opts ...ClientOption) (*grpc.ClientConn, 
 	return dial(ctx, true, opts...)
 }
 
+/*
+
+ */
+
 func Dial(ctx context.Context, opts ...ClientOption) (*grpc.ClientConn, error) {
 	return dial(ctx, false, opts...)
 }

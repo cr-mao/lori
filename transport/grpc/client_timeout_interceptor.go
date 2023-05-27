@@ -20,6 +20,15 @@ func clientTimeoutInterceptor(timeout time.Duration) grpc.UnaryClientInterceptor
 			ctx, cancel = context.WithTimeout(ctx, timeout)
 			defer cancel()
 		}
+
+		/**
+		md :=metadata.New(map[string]string{"crmao":"crmaoclient"})
+		newCtx :=metadata.NewOutgoingContext(ctx,md)
+		链接的时候把ctx 传进去，那么就带上这个header头了
+		**/
+
+		//追加metadata
+		//metadata.AppendToOutgoingContext(ctx,"crmao","go编程")
 		return invoker(ctx, method, req, reply, cc, opts...)
 	}
 }

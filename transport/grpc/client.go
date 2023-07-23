@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"github.com/cr-mao/lori/metric"
 	"github.com/cr-mao/lori/registry"
+	"github.com/cr-mao/lori/transport/grpc/resolver/discovery"
 	"google.golang.org/grpc/credentials"
 
 	grpcinsecure "google.golang.org/grpc/credentials/insecure"
@@ -143,15 +144,15 @@ func dial(ctx context.Context, insecure bool, opts ...ClientOption) (*grpc.Clien
 		grpc.WithChainStreamInterceptor(streamInts...),
 	}
 
-	//TODO 服务发现的选项
-	//if options.discovery != nil {
-	//	grpcOpts = append(grpcOpts, grpc.WithResolvers(
-	//		discovery.NewBuilder(
-	//			options.discovery,
-	//			discovery.WithInsecure(insecure),
-	//		),
-	//	))
-	//}
+	// 服务发现的选项
+	if options.discovery != nil {
+		grpcOpts = append(grpcOpts, grpc.WithResolvers(
+			discovery.NewBuilder(
+				options.discovery,
+				discovery.WithInsecure(insecure),
+			),
+		))
+	}
 	if options.tlsConf != nil {
 		grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(credentials.NewTLS(options.tlsConf)))
 	}

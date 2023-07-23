@@ -20,18 +20,18 @@ type options struct {
 	name      string
 	version   string
 	metadata  map[string]string
-	endpoints []*url.URL
+	endpoints []*url.URL // 暴露的地址
 
-	ctx  context.Context
-	sigs []os.Signal
+	ctx  context.Context // 上下文，可以传入进来，一般是不需要的。应该就是background context 出发的
+	sigs []os.Signal     // 注册信号
 
 	logger           log.Logger
-	registrar        registry.Registrar
-	registrarTimeout time.Duration
-	stopTimeout      time.Duration
-	servers          []transport.Server
+	registrar        registry.Registrar // 服务注册
+	registrarTimeout time.Duration      // 服务注册超时
+	stopTimeout      time.Duration      // 停止超时时间，可以给很多的值，看情况自己顶
+	servers          []transport.Server //  有哪些server
 
-	// Before and After funcs
+	// Before and After funcs  钩子函数
 	beforeStart []func(context.Context) error
 	beforeStop  []func(context.Context) error
 	afterStart  []func(context.Context) error

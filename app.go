@@ -18,11 +18,11 @@ import (
 
 // AppInfo is application context value.
 type AppInfo interface {
-	ID() string
-	Name() string
-	Version() string
-	Metadata() map[string]string
-	Endpoint() []string
+	ID() string                  // app id
+	Name() string                // 应用名
+	Version() string             // 应用版本
+	Metadata() map[string]string // meta信息
+	Endpoint() []string          // 暴露端点
 }
 
 type App struct {
@@ -83,12 +83,16 @@ func (a *App) Run() error {
 		server := srv
 		eg.Go(func() error {
 			<-ctx.Done() // wait for stop signal , 收到信号后走Stop方法，然后把app的context cancel掉，那么它的子context就会关闭。
+			// 现在是收到信号后，里面进行关闭 todo 确认是否能这样。
 			stopCtx, cancel := context.WithTimeout(NewContext(a.opts.ctx, a), a.opts.stopTimeout)
 			defer cancel()
 			return server.Stop(stopCtx) //执行server的stop 下面的start 方法会停止阻塞。
 		})
 		wg.Add(1)
+
+		// 在go程中异步start
 		eg.Go(func() error {
+			// 服务启动 是不用一定一定先于注册， 注册中心自己会自己进行探测
 			wg.Done() // here is to ensure server start has begun running before register, so defer is not needed
 			return server.Start(sctx)
 		})
@@ -98,10 +102,13 @@ func (a *App) Run() error {
 	if a.opts.registrar != nil {
 		rctx, rcancel := context.WithTimeout(ctx, a.opts.registrarTimeout)
 		defer rcancel()
+		// 进行注册
 		if err = a.opts.registrar.Register(rctx, instance); err != nil {
 			return err
 		}
 	}
+
+	// after start 钩子函数
 	for _, fn := range a.opts.afterStart {
 		if err = fn(sctx); err != nil {
 			return err
@@ -118,6 +125,8 @@ func (a *App) Run() error {
 			return a.Stop()
 		}
 	})
+
+	// 阻塞等待 直到有错误发生。 非canceld的 则是错的
 	if err = eg.Wait(); err != nil && !errors.Is(err, context.Canceled) {
 		return err
 	}
@@ -133,6 +142,7 @@ func (a *App) Stop() (err error) {
 	for _, fn := range a.opts.beforeStop {
 		err = fn(sctx)
 	}
+	// 启动和关闭其实是异步的 ，加锁比较好。
 	a.locker.Lock()
 	instance := a.instance
 	a.locker.Unlock()

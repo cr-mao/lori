@@ -5,11 +5,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ### 1.介绍
-lori 是一款基于golang的分布式服务器框架,目标是快速构建服务。 
+lori 是一款基于golang的分布式web服务器框架,目标是快速构建服务。 
 - http server 基于gin 
 - grpc server  
 - grpc client 
-- tcp server 基于 [zinx v1.1.20](https://github.com/aceld/zinx) 改造, 适配lori的transport。
 
 
 ### 2.安装

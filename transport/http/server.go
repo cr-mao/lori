@@ -33,7 +33,7 @@ type Server struct {
 	network     string
 	address     string
 
-	//开发模式， 默认值 debug
+	//开发模式， 默认值 debug 	, gin  DebugMode = "debug", "release", "test"
 	mode string
 
 	//是否开启pprof接口， 默认开启， 如果开启会自动添加 /debug/pprof 接口

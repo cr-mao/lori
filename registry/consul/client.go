@@ -9,9 +9,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hashicorp/consul/api"
+
 	"github.com/cr-mao/lori/log"
 	"github.com/cr-mao/lori/registry"
-	"github.com/hashicorp/consul/api"
 )
 
 // Client is consul client config

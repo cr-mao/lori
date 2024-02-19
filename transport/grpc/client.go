@@ -3,16 +3,16 @@ package grpc
 import (
 	"context"
 	"crypto/tls"
-	"github.com/cr-mao/lori/transport/grpc/resolver/direct"
-	"google.golang.org/grpc/resolver"
 	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	grpcinsecure "google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/resolver"
 
 	"github.com/cr-mao/lori/metric"
 	"github.com/cr-mao/lori/registry"
+	"github.com/cr-mao/lori/transport/grpc/resolver/direct"
 	"github.com/cr-mao/lori/transport/grpc/resolver/discovery"
 )
 

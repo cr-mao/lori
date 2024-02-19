@@ -32,7 +32,7 @@ type clientOptions struct {
 	//enableMetrics bool
 }
 
-func WithMetric(metric metric.GrpcClientMetric) ClientOption {
+func WithClientMetric(metric metric.GrpcClientMetric) ClientOption {
 	return func(o *clientOptions) {
 		o.metric = metric
 	}
@@ -45,7 +45,7 @@ func WithEnableTracing(enable bool) ClientOption {
 }
 
 // 设置地址
-func WithEndpoint(endpoint string) ClientOption {
+func WithClientEndpoint(endpoint string) ClientOption {
 	return func(o *clientOptions) {
 		o.endpoint = endpoint
 	}
@@ -59,7 +59,7 @@ func WithClientTimeout(timeout time.Duration) ClientOption {
 }
 
 // 设置服务发现
-func WithDiscovery(d registry.Discovery) ClientOption {
+func WithClientDiscovery(d registry.Discovery) ClientOption {
 	return func(o *clientOptions) {
 		o.discovery = d
 	}

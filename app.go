@@ -9,11 +9,12 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/google/uuid"
+	"golang.org/x/sync/errgroup"
+
 	"github.com/cr-mao/lori/log"
 	"github.com/cr-mao/lori/registry"
 	"github.com/cr-mao/lori/transport"
-	"github.com/google/uuid"
-	"golang.org/x/sync/errgroup"
 )
 
 // AppInfo is application context value.

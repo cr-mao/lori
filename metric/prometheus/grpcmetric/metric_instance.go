@@ -2,10 +2,12 @@ package grpcmetric
 
 import (
 	"context"
+	"time"
+
+	"google.golang.org/grpc"
+
 	"github.com/cr-mao/lori/metric"
 	"github.com/cr-mao/lori/metric/prometheus"
-	"google.golang.org/grpc"
-	"time"
 )
 
 type PromInstance struct {

@@ -2,9 +2,11 @@ package grpc
 
 import (
 	"context"
-	"github.com/cr-mao/lori/log"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
+
+	"github.com/cr-mao/lori/log"
 )
 
 func unaryErrorLogInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,

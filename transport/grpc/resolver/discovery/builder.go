@@ -6,8 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cr-mao/lori/registry"
 	"google.golang.org/grpc/resolver"
+
+	"github.com/cr-mao/lori/registry"
 )
 
 const name = "discovery"

@@ -3,15 +3,15 @@ package grpc
 import (
 	"context"
 	"crypto/tls"
+	"time"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+	grpcinsecure "google.golang.org/grpc/credentials/insecure"
+
 	"github.com/cr-mao/lori/metric"
 	"github.com/cr-mao/lori/registry"
 	"github.com/cr-mao/lori/transport/grpc/resolver/discovery"
-	"google.golang.org/grpc/credentials"
-
-	grpcinsecure "google.golang.org/grpc/credentials/insecure"
-
-	"google.golang.org/grpc"
-	"time"
 )
 
 type ClientOption func(o *clientOptions)
@@ -29,7 +29,7 @@ type clientOptions struct {
 
 	balancerName  string
 	enableTracing bool
-	enableMetrics bool
+	//enableMetrics bool
 }
 
 func WithMetric(metric metric.GrpcClientMetric) ClientOption {
@@ -153,12 +153,15 @@ func dial(ctx context.Context, insecure bool, opts ...ClientOption) (*grpc.Clien
 			),
 		))
 	}
+	// tls 传输
 	if options.tlsConf != nil {
 		grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(credentials.NewTLS(options.tlsConf)))
 	}
+	// 不安全的
 	if insecure {
 		grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(grpcinsecure.NewCredentials()))
 	}
+	// 额外传的选项
 	if len(options.rpcOpts) > 0 {
 		grpcOpts = append(grpcOpts, options.rpcOpts...)
 	}

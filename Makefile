@@ -25,13 +25,33 @@ tidy:
 download:
 	go mod download
 
+## test: 单元测试全部测试代码
+.PHONY: test
+test:
+	go test ./... -cover
+
 ## vet: 静态检测全部go代码
+.PHONY: vet
 vet:
+#	go install golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow@latest
+#	go vet -vettool=`which shadow` ./...
 	go vet ./...
 
+## bench 并发测试
+.PHONY: bench
+bench:
+	go test ./...  -test.bench . -test.benchmem=true
+
 ## test: 单元测试全部测试代码
-test:
-	go test ./...
+.PHONY: fmt
+fmt:
+	gofmt -w -l .
+
+lint:
+	golangci-lint cache clean
+	golangci-lint run
+
+check: fmt lint vet
 
 ## help: Show this help info.
 .PHONY: help

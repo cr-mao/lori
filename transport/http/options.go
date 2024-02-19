@@ -2,8 +2,9 @@ package http
 
 import (
 	"crypto/tls"
-	"github.com/cr-mao/lori/metric"
 	"time"
+
+	"github.com/cr-mao/lori/metric"
 )
 
 type ServerOption func(*Server)

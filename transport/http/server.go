@@ -4,20 +4,20 @@ import (
 	"context"
 	"crypto/tls"
 	"errors"
-	"github.com/cr-mao/lori/metric"
-
 	"net"
 	"net/http"
 	"net/url"
 	"time"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/cr-mao/lori/internal/endpoint"
 	"github.com/cr-mao/lori/internal/host"
 	"github.com/cr-mao/lori/log"
+	"github.com/cr-mao/lori/metric"
 	"github.com/cr-mao/lori/transport"
 	mids "github.com/cr-mao/lori/transport/http/middlewares"
 	"github.com/cr-mao/lori/transport/http/pprof"
-	"github.com/gin-gonic/gin"
 )
 
 var _ transport.Endpointer = (*Server)(nil)

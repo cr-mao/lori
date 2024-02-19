@@ -87,7 +87,7 @@ func InternalIP() (string, error) {
 			case *net.IPAddr:
 				ipnet = v.IP
 			default:
-				err = errors.New("invalid addr interface")
+				//err = errors.New("invalid addr interface")
 				continue
 			}
 

@@ -3,14 +3,10 @@ package grpc
 import (
 	"context"
 	"crypto/tls"
-	"github.com/cr-mao/lori/metric"
 	"net"
 	"net/url"
 	"time"
 
-	"github.com/cr-mao/lori/internal/endpoint"
-	"github.com/cr-mao/lori/internal/host"
-	"github.com/cr-mao/lori/transport"
 	//apimd "github.com/cr-mao/lori/api/metadata"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -18,7 +14,11 @@ import (
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/cr-mao/lori/internal/endpoint"
+	"github.com/cr-mao/lori/internal/host"
 	"github.com/cr-mao/lori/log"
+	"github.com/cr-mao/lori/metric"
+	"github.com/cr-mao/lori/transport"
 )
 
 var _ transport.Endpointer = (*Server)(nil)

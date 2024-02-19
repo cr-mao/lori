@@ -8,10 +8,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/cr-mao/lori/log"
-	"github.com/cr-mao/lori/registry"
 	"google.golang.org/grpc/attributes"
 	"google.golang.org/grpc/resolver"
+
+	"github.com/cr-mao/lori/log"
+	"github.com/cr-mao/lori/registry"
 )
 
 type discoveryResolver struct {

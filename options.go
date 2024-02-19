@@ -28,7 +28,7 @@ type options struct {
 	logger           log.Logger
 	registrar        registry.Registrar // 服务注册
 	registrarTimeout time.Duration      // 服务注册超时
-	stopTimeout      time.Duration      // 停止超时时间，可以给很多的值，看情况自己顶
+	stopTimeout      time.Duration      // 停止超时时间，可以给很大的值，看情况自己定
 	servers          []transport.Server //  有哪些server
 
 	// Before and After funcs  钩子函数

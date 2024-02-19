@@ -1,0 +1,37 @@
+run:
+  timeout: 30m
+  skip-dirs:
+    - examples
+    - doc
+  skip-files:
+    - _test.go
+
+linters:
+  disable-all: true
+  enable:
+    - unused
+    - ineffassign
+    - goimports
+    - gofmt
+    - misspell
+    - unparam
+    - unconvert
+    - govet
+#    - errcheck
+    - staticcheck
+
+linters-settings:
+  staticcheck:
+    go: "1.18"
+    checks:
+      - "all"
+      - "-SA1019"
+  goimports:
+    # 设置哪些包放在第三方包后面，可以设置多个包，逗号隔开
+    local-prefixes: github.com/cr-mao/lori
+  unused:
+    go: "1.18"
+
+
+# golangci-lint  1.48.0
+# go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.48.0

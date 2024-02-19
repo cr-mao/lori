@@ -24,6 +24,7 @@ type HelloWorldServer struct {
 }
 
 func (s *HelloWorldServer) SayHello(ctx context.Context, r *proto.HelloRequest) (*proto.HelloResponse, error) {
+	log.Info("in")
 	return &proto.HelloResponse{
 		Message: "hello " + r.Name,
 	}, nil
@@ -43,6 +44,28 @@ func TestAppServer(t *testing.T) {
 	}
 	r := consul.New(cli, consul.WithHealthCheck(true))
 	grpcServer := grpc.NewServer(grpc.WithAddress("0.0.0.0:8081"))
+	registerServer(grpcServer)
+	app := lori.New(lori.WithName("lori-app"),
+		lori.WithServer(grpcServer),
+		lori.WithRegistrar(r),
+		lori.WithRegistrarTimeout(time.Second*5),
+	)
+	err = app.Run()
+	if err != nil {
+		log.Errorf("err %v", err)
+	}
+}
+
+func TestAppServer2(t *testing.T) {
+	c := api.DefaultConfig()
+	c.Address = "127.0.0.1:8500"
+	c.Scheme = "http"
+	cli, err := api.NewClient(c)
+	if err != nil {
+		panic(err)
+	}
+	r := consul.New(cli, consul.WithHealthCheck(true))
+	grpcServer := grpc.NewServer(grpc.WithAddress("0.0.0.0:8082"))
 	registerServer(grpcServer)
 	app := lori.New(lori.WithName("lori-app"),
 		lori.WithServer(grpcServer),

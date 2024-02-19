@@ -18,16 +18,15 @@ go get github.com/cr-mao/lori@v0.0.3
 
 
 ### 3.组件选用
-
-服务注册发现 
-- consul 
-指标监控
-- prometheus
-日志
-- zap 
+- 服务注册发现 consul 
+- 指标监控 prometheus
+- 日志  zap 
 
 
-### 4. 参考
+### 4. 如何使用
+见example目录
+
+### 5. 参考
 - [due](https://github.com/dobyte/due)
 - [kratos](https://github.com/go-kratos/kratos)
 - [iam极客时间go语言项目实战](https://github.com/marmotedu/iam)

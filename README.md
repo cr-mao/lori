@@ -17,26 +17,19 @@ go get github.com/cr-mao/lori@v0.0.3
 ```
 
 
-### 3.模块化设计 
+### 3.组件选用
 
 服务注册发现 
 - consul 
-```shell
-go get github.com/cr-mao/lori/registry/consul@v0.0.3
-```
-
 指标监控
 - prometheus
-
 日志
 - zap 
 
 
-
 ### 4. 参考
-- kratos
-- go-zero
-- due框架
-- iam 极客时间go语言项目实战
+- [due](https://github.com/dobyte/due)
+- [kratos](https://github.com/go-kratos/kratos)
+- [iam极客时间go语言项目实战](https://github.com/marmotedu/iam)
 
 

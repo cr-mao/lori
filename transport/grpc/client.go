@@ -3,6 +3,8 @@ package grpc
 import (
 	"context"
 	"crypto/tls"
+	"github.com/cr-mao/lori/transport/grpc/resolver/direct"
+	"google.golang.org/grpc/resolver"
 	"time"
 
 	"google.golang.org/grpc"
@@ -143,16 +145,16 @@ func dial(ctx context.Context, insecure bool, opts ...ClientOption) (*grpc.Clien
 		grpc.WithChainUnaryInterceptor(ints...),
 		grpc.WithChainStreamInterceptor(streamInts...),
 	}
-
-	// 服务发现的选项
+	resolvers := make([]resolver.Builder, 0, 2)
+	resolvers = append(resolvers, direct.NewBuilder())
+	// 服务发现选项
 	if options.discovery != nil {
-		grpcOpts = append(grpcOpts, grpc.WithResolvers(
-			discovery.NewBuilder(
-				options.discovery,
-				discovery.WithInsecure(insecure),
-			),
+		resolvers = append(resolvers, discovery.NewBuilder(
+			options.discovery,
+			discovery.WithInsecure(insecure),
 		))
 	}
+	grpcOpts = append(grpcOpts, grpc.WithResolvers(resolvers...))
 	// tls 传输
 	if options.tlsConf != nil {
 		grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(credentials.NewTLS(options.tlsConf)))

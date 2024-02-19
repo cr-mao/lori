@@ -203,10 +203,13 @@ func (r *Registry) resolve(ss *serviceSet) error {
 	} else if len(services) > 0 {
 		ss.broadcast(services)
 	}
+
+	// 一直常驻，长轮训获得变化数据。
 	go func() {
 		ticker := time.NewTicker(time.Second)
 		defer ticker.Stop()
 		for {
+			fmt.Println(111)
 			<-ticker.C
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second*120)
 			tmpService, tmpIdx, err := r.cli.Service(ctx, ss.serviceName, idx, true)

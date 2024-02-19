@@ -8,9 +8,13 @@ package example
 
 import (
 	"context"
+	"github.com/cr-mao/lori"
 	"github.com/cr-mao/lori/example/proto"
 	"github.com/cr-mao/lori/log"
+	"github.com/cr-mao/lori/registry/consul"
+	"github.com/hashicorp/consul/api"
 	"testing"
+	"time"
 
 	"github.com/cr-mao/lori/transport/grpc"
 )
@@ -29,11 +33,23 @@ func registerServer(server *grpc.Server) {
 	proto.RegisterGreeterServer(server, &HelloWorldServer{})
 }
 
-func TestGrpcServer(t *testing.T) {
-	baseCtx := context.Background()
+func TestAppServer(t *testing.T) {
+	c := api.DefaultConfig()
+	c.Address = "127.0.0.1:8500"
+	c.Scheme = "http"
+	cli, err := api.NewClient(c)
+	if err != nil {
+		panic(err)
+	}
+	r := consul.New(cli, consul.WithHealthCheck(true))
 	grpcServer := grpc.NewServer(grpc.WithAddress("0.0.0.0:8081"))
 	registerServer(grpcServer)
-	err := grpcServer.Start(baseCtx)
+	app := lori.New(lori.WithName("lori-app"),
+		lori.WithServer(grpcServer),
+		lori.WithRegistrar(r),
+		lori.WithRegistrarTimeout(time.Second*5),
+	)
+	err = app.Run()
 	if err != nil {
 		log.Errorf("err %v", err)
 	}

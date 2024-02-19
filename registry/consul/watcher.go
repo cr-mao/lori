@@ -15,6 +15,7 @@ type watcher struct {
 	cancel context.CancelFunc
 }
 
+// 返回新的注册实例
 func (w *watcher) Next() (services []*registry.ServiceInstance, err error) {
 	select {
 	case <-w.ctx.Done():
@@ -22,6 +23,7 @@ func (w *watcher) Next() (services []*registry.ServiceInstance, err error) {
 	case <-w.event:
 	}
 
+	// 有变化的适合，event事件会过来， 就有新数据
 	ss, ok := w.set.services.Load().([]*registry.ServiceInstance)
 
 	if ok {

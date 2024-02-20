@@ -27,11 +27,12 @@ func TLSConfig(c *tls.Config) ServerOption {
 		o.tlsConf = c
 	}
 }
-func WithEnableProfiling(profiling bool) ServerOption {
-	return func(s *Server) {
-		s.enableProfiling = profiling
-	}
-}
+
+//func WithEnableProfiling(profiling bool) ServerOption {
+//	return func(s *Server) {
+//		s.enableProfiling = profiling
+//	}
+//}
 
 func WithMode(mode string) ServerOption {
 	return func(s *Server) {

@@ -10,9 +10,12 @@ import (
 	"context"
 	"github.com/cr-mao/lori"
 	"github.com/cr-mao/lori/example/proto"
+	"github.com/cr-mao/lori/internal/netlib"
 	"github.com/cr-mao/lori/log"
+	"github.com/cr-mao/lori/pprof_server"
 	"github.com/cr-mao/lori/registry/consul"
 	"github.com/hashicorp/consul/api"
+	"strconv"
 	"testing"
 	"time"
 
@@ -44,9 +47,11 @@ func TestAppServer(t *testing.T) {
 	}
 	r := consul.New(cli, consul.WithHealthCheck(true))
 	grpcServer := grpc.NewServer(grpc.WithAddress("0.0.0.0:8081"))
+	pprofPort, _ := netlib.AssignRandPort()
+	pprofServer := pprof_server.NewPProf("0.0.0.0:" + strconv.Itoa(pprofPort))
 	registerServer(grpcServer)
 	app := lori.New(lori.WithName("lori-app"),
-		lori.WithServer(grpcServer),
+		lori.WithServer(grpcServer, pprofServer),
 		lori.WithRegistrar(r),
 		lori.WithRegistrarTimeout(time.Second*5),
 	)
@@ -66,9 +71,11 @@ func TestAppServer2(t *testing.T) {
 	}
 	r := consul.New(cli, consul.WithHealthCheck(true))
 	grpcServer := grpc.NewServer(grpc.WithAddress("0.0.0.0:8082"))
+	pprofPort, _ := netlib.AssignRandPort()
+	pprofServer := pprof_server.NewPProf("0.0.0.0:" + strconv.Itoa(pprofPort))
 	registerServer(grpcServer)
 	app := lori.New(lori.WithName("lori-app"),
-		lori.WithServer(grpcServer),
+		lori.WithServer(grpcServer, pprofServer),
 		lori.WithRegistrar(r),
 		lori.WithRegistrarTimeout(time.Second*5),
 	)

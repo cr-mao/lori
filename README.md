@@ -17,11 +17,15 @@ go get github.com/cr-mao/lori@v0.0.3
 ```
 
 
-### 3.组件选用
-- 服务注册发现 consul 
+### 3.组件
+- 服务注册发现 
+  - consul 
+  - 其他可自行实现接口进行扩充
 - 指标监控 prometheus
-- 日志  zap 
-
+  - 内置请求耗时Histogram中间件
+  - 其他指标收集，可自行实现接口扩充
+- 日志  
+  - zap
 
 ### 4. 如何使用
 见example目录
@@ -30,5 +34,3 @@ go get github.com/cr-mao/lori@v0.0.3
 - [due](https://github.com/dobyte/due)
 - [kratos](https://github.com/go-kratos/kratos)
 - [iam极客时间go语言项目实战](https://github.com/marmotedu/iam)
-
-

@@ -17,7 +17,6 @@ import (
 	"github.com/cr-mao/lori/metric"
 	"github.com/cr-mao/lori/transport"
 	mids "github.com/cr-mao/lori/transport/http/middlewares"
-	"github.com/cr-mao/lori/transport/http/pprof"
 )
 
 var _ transport.Endpointer = (*Server)(nil)
@@ -37,9 +36,10 @@ type Server struct {
 	mode string
 
 	//是否开启pprof接口， 默认开启， 如果开启会自动添加 /debug/pprof 接口
-	enableProfiling bool
+	// 整个app 自动进行pprof，推荐这么用
+	//enableProfiling bool
 
-	//是否开启metrics接口， 默认开启， 如果开启会自动添加 /metrics 接口, prometheus , todo 优化成一个接口。
+	//是否开启metrics接口， 默认开启， 如果开启会自动添加 /metrics 接口, prometheus
 	metric metric.GinMetric
 
 	//中间件
@@ -55,13 +55,13 @@ type Server struct {
 
 func NewServer(opts ...ServerOption) *Server {
 	srv := &Server{
-		network:         "tcp",
-		address:         ":0",
-		mode:            "debug",
-		enableProfiling: true,
-		Engine:          gin.New(), //纯的，没有logger，和default 。
-		serviceName:     "lori-gin-http",
-		timeout:         time.Second * 5, //默认5秒
+		network: "tcp",
+		address: ":0",
+		mode:    "debug",
+		//enableProfiling: true,
+		Engine:      gin.New(), //纯的，没有logger，和default 。
+		serviceName: "lori-gin-http",
+		timeout:     time.Second * 5, //默认5秒
 	}
 	for _, o := range opts {
 		o(srv)
@@ -128,9 +128,9 @@ func (s *Server) Endpoint() (*url.URL, error) {
 // start rest server
 func (s *Server) Start(ctx context.Context) error {
 	//根据配置初始化pprof路由
-	if s.enableProfiling {
-		pprof.Register(s.Engine)
-	}
+	//if s.enableProfiling {
+	//	pprof.Register(s.Engine)
+	//}
 	if s.metric != nil {
 		s.metric.Use(s.Engine)
 	}

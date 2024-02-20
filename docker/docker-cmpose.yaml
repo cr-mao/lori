@@ -1,6 +1,22 @@
 version: "3"
 
 services:
+  consul:
+    image: bitnami/consul:latest
+    container_name: dev-consul
+    platform: linux/x86_64
+    restart: always
+    ports:
+      - '8300:8300'
+      - '8301:8301'
+      - '8301:8301/udp'
+      - '8500:8500'
+      - '8600:8600'
+      - '8600:8600/udp'
+    volumes:
+      - ./consul:/bitnami
+    networks:
+      - middleware
 #  mysql:
 #    image: mysql:5.7
 #    container_name: dev-mysql
@@ -39,20 +55,6 @@ services:
 #      - '2380:2380'
 #    networks:
 #      - middleware
-  consul:
-    image: bitnami/consul:latest
-    container_name: dev-consul
-    platform: linux/x86_64
-    restart: always
-    ports:
-      - '8300:8300'
-      - '8301:8301'
-      - '8301:8301/udp'
-      - '8500:8500'
-      - '8600:8600'
-      - '8600:8600/udp'
-    volumes:
-      - ./consul:/bitnami
 #  redis-cluster:
 #    image: grokzen/redis-cluster:latest
 #    container_name: dev-redis-cluster
@@ -63,6 +65,8 @@ services:
 #      - SENTINEL=true
 #    ports:
 #      - '7000-7005:7000-7005'
+#    networks:
+#      - middleware
 #  nats:
 #    image: nats:latest
 #    container_name: dev-nats
@@ -72,6 +76,8 @@ services:
 #      - '4222:4222'
 #      - '6222:6222'
 #      - '8222:8222'
+#    networks:
+#      - middleware
 networks:
   middleware:
     driver: bridge

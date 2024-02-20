@@ -37,7 +37,7 @@ vet:
 #	go vet -vettool=`which shadow` ./...
 	go vet ./...
 
-## bench 并发测试
+## bench: 并发测试
 .PHONY: bench
 bench:
 	go test ./...  -test.bench . -test.benchmem=true
@@ -47,10 +47,16 @@ bench:
 fmt:
 	gofmt -w -l .
 
+
+## lint: golangci-lint
+.PHONY: lint
 lint:
 	golangci-lint cache clean
 	golangci-lint run
 
+
+## check: fmt lint vet
+.PHONY: check
 check: fmt lint vet
 
 ## help: Show this help info.

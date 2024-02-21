@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//外部可以用
+// 外部可以用
 const (
 	RECOVERY string = "recovery"
 	CORS     string = "cors"

@@ -1,4 +1,5 @@
-/**
+/*
+*
 User: cr-mao
 Date: 2024/2/19 12:48
 Email: crmao@qq.com
@@ -14,6 +15,7 @@ import (
 	"github.com/cr-mao/lori/log"
 	"github.com/cr-mao/lori/pprof_server"
 	"github.com/cr-mao/lori/registry/consul"
+	"github.com/cr-mao/lori/trace"
 	"github.com/hashicorp/consul/api"
 	"strconv"
 	"testing"
@@ -38,6 +40,14 @@ func registerServer(server *grpc.Server) {
 }
 
 func TestAppServer(t *testing.T) {
+
+	trace.InitAgent(trace.Options{
+		Name:     "lori_example",
+		Endpoint: "http://127.0.0.1:14268/api/traces",
+		Sampler:  1.0,
+		Batcher:  "jaeger",
+	})
+
 	c := api.DefaultConfig()
 	c.Address = "127.0.0.1:8500"
 	c.Scheme = "http"
@@ -46,7 +56,10 @@ func TestAppServer(t *testing.T) {
 		panic(err)
 	}
 	r := consul.New(cli, consul.WithHealthCheck(true))
-	grpcServer := grpc.NewServer(grpc.WithAddress("0.0.0.0:8081"))
+	grpcServer := grpc.NewServer(
+		grpc.WithAddress("0.0.0.0:8081"),
+		grpc.WithEnableTrace(true),
+	)
 	pprofPort, _ := netlib.AssignRandPort()
 	pprofServer := pprof_server.NewPProf("0.0.0.0:" + strconv.Itoa(pprofPort))
 	registerServer(grpcServer)

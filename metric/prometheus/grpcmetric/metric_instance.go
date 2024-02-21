@@ -36,7 +36,7 @@ func (p *PromInstance) GrpcMetricInterceptors() []grpc.UnaryServerInterceptor {
 	return []grpc.UnaryServerInterceptor{p.serverUnaryPrometheusInterceptor}
 }
 
-//每个方法耗时的中间件
+// 每个方法耗时的中间件
 func (p *PromInstance) serverUnaryPrometheusInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
 	handler grpc.UnaryHandler) (resp interface{}, err error) {
 	startTime := time.Now()

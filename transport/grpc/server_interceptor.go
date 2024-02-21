@@ -9,7 +9,7 @@ import (
 	"github.com/cr-mao/lori/transport"
 )
 
-//metadata方便获取，请求超时中间件
+// metadata方便获取，请求超时中间件
 // unaryServerInterceptor is a gRPC unary server interceptor
 func (s *Server) unaryServerInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {

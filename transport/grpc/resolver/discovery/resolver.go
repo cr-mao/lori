@@ -2,7 +2,6 @@ package discovery
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"net/url"
 	"strconv"
@@ -78,8 +77,8 @@ func (r *discoveryResolver) update(ins []*registry.ServiceInstance) {
 	if err != nil {
 		log.Errorf("[resolver] failed to update state: %s", err)
 	}
-	b, _ := json.Marshal(ins)
-	log.Infof("[resolver] update instances: %s", b)
+	//b, _ := json.Marshal(ins)
+	//log.Infof("[resolver] update instances: %s", b)
 }
 
 func (r *discoveryResolver) Close() {

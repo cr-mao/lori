@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"time"
 
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	grpcinsecure "google.golang.org/grpc/credentials/insecure"
@@ -31,7 +32,6 @@ type clientOptions struct {
 
 	balancerName  string
 	enableTracing bool
-	//enableMetrics bool
 }
 
 func WithClientMetric(metric metric.GrpcClientMetric) ClientOption {
@@ -40,7 +40,7 @@ func WithClientMetric(metric metric.GrpcClientMetric) ClientOption {
 	}
 }
 
-func WithEnableTracing(enable bool) ClientOption {
+func WithClientEnableTracing(enable bool) ClientOption {
 	return func(o *clientOptions) {
 		o.enableTracing = enable
 	}
@@ -122,9 +122,9 @@ func dial(ctx context.Context, insecure bool, opts ...ClientOption) (*grpc.Clien
 	ints := []grpc.UnaryClientInterceptor{
 		clientTimeoutInterceptor(options.timeout),
 	}
-	//if options.enableTracing {
-	//	ints = append(ints, otelgrpc.UnaryClientInterceptor())
-	//}
+	if options.enableTracing {
+		ints = append(ints, otelgrpc.UnaryClientInterceptor())
+	}
 
 	streamInts := []grpc.StreamClientInterceptor{}
 

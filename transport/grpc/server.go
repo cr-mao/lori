@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"time"
 
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	//apimd "github.com/cr-mao/lori/api/metadata"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -38,10 +39,10 @@ type Server struct {
 	timeout    time.Duration
 	health     *health.Server // 健康检测server
 	//metadata      *apimd.Server
-	endpoint *url.URL          // url
-	metric   metric.GrpcMetric //metric 接口，可以传可不传
-
-	err error
+	endpoint      *url.URL          // url
+	metric        metric.GrpcMetric //metric 接口，可以传可不传
+	enableTracing bool              //是否开启链路追踪
+	err           error
 }
 
 // NewServer creates a gRPC server by options.
@@ -60,6 +61,9 @@ func NewServer(opts ...ServerOption) *Server {
 		unaryCrashInterceptor,        //防止panic crash 中间件
 		srv.unaryServerInterceptor(), //metadata 方便获取， 请求超时控制中间件
 		unaryErrorLogInterceptor,     //发生错误的日志
+	}
+	if srv.enableTracing {
+		unaryInts = append(unaryInts, otelgrpc.UnaryServerInterceptor())
 	}
 
 	if srv.metric != nil {
@@ -172,11 +176,12 @@ func WithAddress(address string) ServerOption {
 	}
 }
 
-//func WithEnableMetrics(enableMetrics bool) ServerOption {
-//	return func(o *Server) {
-//		o.enableMetrics = enableMetrics
-//	}
-//}
+// 是否开启链路追踪
+func WithEnableTrace(enableTraceing bool) ServerOption {
+	return func(o *Server) {
+		o.enableTracing = enableTraceing
+	}
+}
 
 // Listener with server lis
 func WithListener(lis net.Listener) ServerOption {

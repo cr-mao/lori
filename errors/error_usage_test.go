@@ -61,28 +61,32 @@ func Controller1() error {
 测试Wrap 函数
 
 === RUN   TestWrap
-    error_user_test.go:21: call funcB failed
+
+	error_user_test.go:21: call funcB failed
+
 =============
-    error_user_test.go:25: func called error
-        logtest.funcB
-        	/Users/maozhongyu/code/logtest/error_user_test.go:17
-        logtest.funcA
-        	/Users/maozhongyu/code/logtest/error_user_test.go:10
-        logtest.TestWrap
-        	/Users/maozhongyu/code/logtest/error_user_test.go:25
-        testing.tRunner
-        	/Users/maozhongyu/go1.18.5/src/testing/testing.go:1439
-        runtime.goexit
-        	/Users/maozhongyu/go1.18.5/src/runtime/asm_amd64.s:1571
-        call funcB failed
-        logtest.funcA
-        	/Users/maozhongyu/code/logtest/error_user_test.go:11
-        logtest.TestWrap
-        	/Users/maozhongyu/code/logtest/error_user_test.go:25
-        testing.tRunner
-        	/Users/maozhongyu/go1.18.5/src/testing/testing.go:1439
-        runtime.goexit
-        	/Users/maozhongyu/go1.18.5/src/runtime/asm_amd64.s:1571
+
+	error_user_test.go:25: func called error
+	    logtest.funcB
+	    	/Users/maozhongyu/code/logtest/error_user_test.go:17
+	    logtest.funcA
+	    	/Users/maozhongyu/code/logtest/error_user_test.go:10
+	    logtest.TestWrap
+	    	/Users/maozhongyu/code/logtest/error_user_test.go:25
+	    testing.tRunner
+	    	/Users/maozhongyu/go1.18.5/src/testing/testing.go:1439
+	    runtime.goexit
+	    	/Users/maozhongyu/go1.18.5/src/runtime/asm_amd64.s:1571
+	    call funcB failed
+	    logtest.funcA
+	    	/Users/maozhongyu/code/logtest/error_user_test.go:11
+	    logtest.TestWrap
+	    	/Users/maozhongyu/code/logtest/error_user_test.go:25
+	    testing.tRunner
+	    	/Users/maozhongyu/go1.18.5/src/testing/testing.go:1439
+	    runtime.goexit
+	    	/Users/maozhongyu/go1.18.5/src/runtime/asm_amd64.s:1571
+
 --- PASS: TestWrap (0.00s)
 PASS
 */
@@ -117,13 +121,21 @@ func TestIs(t *testing.T) {
 error 1
 Service has error
 logtest.Controller1
+
 	/Users/maozhongyu/code/logtest/error_user_test.go:56
+
 logtest.TestAs
+
 	/Users/maozhongyu/code/logtest/error_user_test.go:116
+
 testing.tRunner
+
 	/Users/maozhongyu/go1.18.5/src/testing/testing.go:1439
+
 runtime.goexit
+
 	/Users/maozhongyu/go1.18.5/src/runtime/asm_amd64.s:1571
+
 -----------
 AS error
 */
